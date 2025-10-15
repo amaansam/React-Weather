@@ -7,7 +7,7 @@ function App() {
 
   const [data, setData] = useState({}) /* State for setting data */
   const [location, setLocation] = useState('') /* State for location */
-  const apiKey = process.env.REACT_APP_OPENWEATHER_API_KEY
+  const apiKey = process.env.REACT_APP_OPENWEATHER_API_KEY /* Uses API key that should be stored inside of .env file */
   const url =`https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=${apiKey}` /*URL used in order to make the API call*/
 
   /* Variable used to search for location, works on the basis of keyboard event
