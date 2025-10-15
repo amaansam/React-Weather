@@ -13,18 +13,57 @@ function App() {
   const apiKey = process.env.REACT_APP_OPENWEATHER_API_KEY /* Uses API key that should be stored inside of .env file */
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=${apiKey}` /*URL used in order to make the API call*/
 
+  const [error, setError] = useState('');
+  const [dayForecast, setDayForecast] = useState(null);
+
+  const onDateChange = async (e) => {
+    const picked = e.target.value;
+    setSelectedDate(picked);
+    setError('');
+
+    if (!data?.name) {           // no location fetched yet
+      setError('Enter a location first');
+      return;
+    }
+
+    try {
+      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${data.name}&units=metric&appid=${apiKey}`;
+      const res = await axios.get(forecastUrl);
+      const allSlots = res.data.list || [];
+      const slotsForDay = allSlots.filter(s => picked && s.dt_txt.startsWith(picked));
+
+      if (slotsForDay.length === 0) {
+        setDayForecast(null);
+        setError('No forecast available for this date (up to 5 days only).');
+        return;
+      }
+
+      // representative noon slot or first available
+      const rep = slotsForDay.find(s => s.dt_txt.endsWith('12:00:00')) || slotsForDay[0];
+      setDayForecast({ city: res.data.city.name, slot: rep });
+    } catch (err) {
+      setError('Could not load forecast. Please try again.')
+    }
+  }
+
   /* Variable used to search for location, works on the basis of keyboard event
   Fetches the data via Axios and sets the response data
   */
-  const searchLocation = (event) => {
+  const searchLocation = async (event) => {
     if (event.key === 'Enter') {
-      axios.get(url).then((response) => {
-        setData(response.data)
-      })
-        .catch((error) => {
-          console.log(error)
-        })
-      setLocation('')
+      if (!location.trim()) return;
+      try {
+        const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${location}&units=metric&appid=${apiKey}`;
+        const [currentRes, forecastRes] = await Promise.all([
+          axios.get(url),
+          axios.get(forecastUrl)
+        ]);
+        setData(currentRes.data);
+        setForecastData(forecastRes.data); // has .list (40 slots) and .city
+        setLocation('')
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 
@@ -48,10 +87,13 @@ function App() {
         <input
           type="date"
           value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
+          onChange={onDateChange}
+          disabled={!data?.name}
           min={today}
           max={fiveDaysAhead}
         />
+        {error && <p style={{ marginTop: 8 }}>{error}</p>}
+        
       </div>
       <div className="container">
         <div className="top">
