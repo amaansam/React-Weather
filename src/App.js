@@ -75,6 +75,27 @@ function App() {
   const today = toLocalISODate(new Date());
   const fiveDaysAhead = toLocalISODate(new Date(Date.now() + 5 * 24 * 60 * 60 * 1000));
 
+
+  const showForecast = !!selectedDate && !!dayForecast;
+
+  const displayName = showForecast ? dayForecast.city : data?.name;
+  const displayTemp = showForecast
+    ? Math.round(dayForecast.slot.main.temp)
+    : data.main && Math.round(data.main.temp);
+  const displayDesc = showForecast
+    ? dayForecast.slot.weather?.[0]?.main
+    : data.weather && data.weather[0].main;
+
+  const displayFeels = showForecast
+    ? Math.round(dayForecast.slot.main.feels_like)
+    : data.main && Math.round(data.main.feels_like);
+  const displayHumidity = showForecast
+    ? dayForecast.slot.main.humidity
+    : data.main && data.main.humidity;
+  const displayWind = showForecast
+    ? dayForecast.slot.wind?.speed
+    : data.wind && data.wind.speed;
+
   return (
     <div className="App">
       <div className="search">
@@ -93,33 +114,33 @@ function App() {
           max={fiveDaysAhead}
         />
         {error && <p style={{ marginTop: 8 }}>{error}</p>}
-        
+
       </div>
       <div className="container">
         <div className="top">
           <div className="location">
-            <p>{data.name}</p>
+            <p>{displayName}</p>
           </div>
           <div className="temp">
-            {data.main ? <h1>{data.main.temp.toFixed()}°C</h1> : null}
+            {displayTemp !== undefined ? <h1>{displayTemp}°C</h1> : null}
           </div>
           <div className="description">
-            {data.weather ? <p>{data.weather[0].main}</p> : null}
+            {displayDesc ? <p>{displayDesc}</p> : null}
           </div>
         </div>
 
         {data.name !== undefined && (
           <div className="bottom">
             <div className="feels">
-              {data.main ? <p className="bold">{data.main.feels_like.toFixed()}°C</p> : null}
+              {displayFeels !==undefined ? <p className='bold'>{displayFeels}°C</p> : null}
               <p>Feels Like</p>
             </div>
             <div className="humidity">
-              {data.main ? <p className="bold">{data.main.humidity}%</p> : null}
+              {displayHumidity !==undefined ? <p className='bold'>{displayHumidity}%</p> : null}
               <p>Humidity</p>
             </div>
             <div className="wind">
-              {data.wind ? <p className="bold">{data.wind.speed} MPH</p> : null}
+              {displayWind !==undefined ? <p className='bold'>{displayWind} MPH</p> : null}
               <p>Wind Speed</p>
             </div>
           </div>
