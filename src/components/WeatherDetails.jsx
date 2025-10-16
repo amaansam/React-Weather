@@ -2,7 +2,7 @@ import React from 'react'
 
 // WeatherDetails
 // Component used to render three small stats: feels-like temp, humidity, and wind speed.
-export default function WeatherDetails({ displayFeels, displayHumidity, displayWind }) {
+export default function WeatherDetails({ displayFeels, displayHumidity, displayWind, displayTime }) {
   return (
     <div className="bottom">
       <div className="feels">
@@ -16,6 +16,10 @@ export default function WeatherDetails({ displayFeels, displayHumidity, displayW
       <div className="wind">
         {displayWind !== undefined ? <p className='bold'>{displayWind} MPH</p> : null}
         <p>Wind Speed</p>
+      </div>
+      <div className='local-time'>
+        {displayTime ? <p className='bold'>{displayTime}</p> : null}
+        <p>Local Time</p>
       </div>
     </div>
   )

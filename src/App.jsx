@@ -61,7 +61,6 @@ function App() {
       setError('Could not load forecast. Please try again.')
     }
   }
-
   /*
    * searchLocation
    * - On Enter it loads the current weather
@@ -117,6 +116,23 @@ function App() {
     ? dayForecast.slot.weather?.[0]?.main
     : data.weather && data.weather[0]?.main
 
+  // Compute local time for the selected location (works for current or forecast)
+  const tzOffsetSeconds = showForecast
+    ? (forecastData?.city?.timezone ?? 0)
+    : (data?.timezone ?? 0)
+
+  const epochSeconds = showForecast
+    ? (dayForecast?.slot?.dt ?? Math.floor(Date.now() / 1000))
+    : Math.floor(Date.now() / 1000)
+
+  const localMs = (epochSeconds + tzOffsetSeconds) * 1000
+  const localDate = new Date(localMs)
+  // Format using UTC getters so the result does not get re-interpreted
+  // by the client's local timezone. We add the timezone offset to the
+  // epoch, then read the UTC hours/minutes to get the location-local time.
+  const pad = (n) => String(n).padStart(2, '0')
+  const displayTime = `${pad(localDate.getUTCHours())}:${pad(localDate.getUTCMinutes())}`
+
   // Displays the search + main container with display and details.
   return (
     <div className="App">
@@ -148,6 +164,7 @@ function App() {
             displayFeels={displayFeels}
             displayHumidity={displayHumidity}
             displayWind={displayWind}
+            displayTime={displayTime}
           />
         )}
 
@@ -156,5 +173,4 @@ function App() {
     </div>
   )
 }
-
 export default App
