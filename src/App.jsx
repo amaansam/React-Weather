@@ -131,7 +131,11 @@ function App() {
   // by the client's local timezone. We add the timezone offset to the
   // epoch, then read the UTC hours/minutes to get the location-local time.
   const pad = (n) => String(n).padStart(2, '0')
-  const displayTime = `${pad(localDate.getUTCHours())}:${pad(localDate.getUTCMinutes())}`
+  const hrs = localDate.getUTCHours()
+  const mins = localDate.getUTCMinutes()
+  const period = hrs >= 12 ? 'PM' : 'AM'
+  const hrs12 = hrs % 12 === 0 ? 12 : hrs % 12
+  const displayTime = `${hrs12}:${pad(mins)} ${period}`
 
   // Displays the search + main container with display and details.
   return (
