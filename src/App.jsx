@@ -127,6 +127,7 @@ function App() {
 
   const localMs = (epochSeconds + tzOffsetSeconds) * 1000
   const localDate = new Date(localMs)
+  
   // Format using UTC getters so the result does not get re-interpreted
   // by the client's local timezone. We add the timezone offset to the
   // epoch, then read the UTC hours/minutes to get the location-local time.
