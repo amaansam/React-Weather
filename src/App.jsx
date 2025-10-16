@@ -1,24 +1,39 @@
 import React, { useState } from 'react'
-import axios from 'axios'
 import Search from './components/Search.jsx'
 import WeatherDisplay from './components/WeatherDisplay.jsx'
 import WeatherDetails from './components/WeatherDetails.jsx'
 import './index.css'
 
-function App() {
-  console.log('API key present?', !!process.env.REACT_APP_OPENWEATHER_API_KEY);
+// Helpers
+// Uses helpers functions to call the OpenWeather endpoints and to compute
+// the date range (today -> five days ahead) used by the date picker.
+import { getCurrentWeather, getForecast } from './api/openWeather'
+import { getTodayAndFiveDaysAhead } from './utils/date'
 
+
+function App() {
+  // Log to check if API key is present or not
+  console.log('API key present?', !!process.env.REACT_APP_OPENWEATHER_API_KEY)
+
+  // States
+  // I keep the current weather in `data`, the typed search in `location`,
+  // the date picker value in `selectedDate`, and forecast-related data below.
   const [data, setData] = useState({})
   const [location, setLocation] = useState('')
   const [selectedDate, setSelectedDate] = useState('')
   const [forecastData, setForecastData] = useState(null)
-
-  const apiKey = process.env.REACT_APP_OPENWEATHER_API_KEY
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=${apiKey}`
-
   const [error, setError] = useState('')
   const [dayForecast, setDayForecast] = useState(null)
 
+  // Config to access the API key from environment variable
+  //Reads the API key once and passes it to the helper functions.
+  const apiKey = process.env.REACT_APP_OPENWEATHER_API_KEY
+
+  // Restricts the date picker to the 5-day forecast window.
+  const { today, fiveDaysAhead } = getTodayAndFiveDaysAhead()
+
+  // Handler for when a date is picked from the date picker.
+  // It loads the forecast for the chosen date (if a location is present).
   const onDateChange = async (e) => {
     const picked = e.target.value
     setSelectedDate(picked)
@@ -30,10 +45,9 @@ function App() {
     }
 
     try {
-      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${data.name}&units=metric&appid=${apiKey}`
-      const res = await axios.get(forecastUrl)
-      const allSlots = res.data.list || []
-      const slotsForDay = allSlots.filter(s => picked && s.dt_txt.startsWith(picked))
+      const res = await getForecast(data.name, apiKey)
+      const allSlots = res.list || []
+      const slotsForDay = allSlots.filter((s) => picked && s.dt_txt.startsWith(picked))
 
       if (slotsForDay.length === 0) {
         setDayForecast(null)
@@ -41,24 +55,28 @@ function App() {
         return
       }
 
-      const rep = slotsForDay.find(s => s.dt_txt.endsWith('12:00:00')) || slotsForDay[0]
-      setDayForecast({ city: res.data.city.name, slot: rep })
+      const rep = slotsForDay.find((s) => s.dt_txt.endsWith('12:00:00')) || slotsForDay[0]
+      setDayForecast({ city: res.city.name, slot: rep })
     } catch (err) {
       setError('Could not load forecast. Please try again.')
     }
   }
 
+  /*
+   * searchLocation
+   * - On Enter it loads the current weather
+   * - Fetches both current weather and the 5-day forecast in parallel.
+   */
   const searchLocation = async (event) => {
     if (event.key === 'Enter') {
       if (!location.trim()) return
       try {
-        const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${location}&units=metric&appid=${apiKey}`
         const [currentRes, forecastRes] = await Promise.all([
-          axios.get(url),
-          axios.get(forecastUrl)
+          getCurrentWeather(location, apiKey),
+          getForecast(location, apiKey)
         ])
-        setData(currentRes.data)
-        setForecastData(forecastRes.data)
+        setData(currentRes)
+        setForecastData(forecastRes)
         setLocation('')
       } catch (error) {
         console.log(error)
@@ -66,14 +84,7 @@ function App() {
     }
   }
 
-  const toLocalISODate = (d) =>
-    new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-      .toISOString()
-      .slice(0, 10)
-
-  const today = toLocalISODate(new Date())
-  const fiveDaysAhead = toLocalISODate(new Date(Date.now() + 5 * 24 * 60 * 60 * 1000))
-
+  // Display values for the UI
   const showForecast = !!selectedDate && !!dayForecast
 
   const displayName = showForecast ? dayForecast.city : data?.name
@@ -94,6 +105,7 @@ function App() {
     ? dayForecast.slot.wind?.speed
     : data.wind && data.wind.speed
 
+  // Displays the search + main container with display and details.
   return (
     <div className="App">
       <div className="search">

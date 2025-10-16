@@ -1,5 +1,7 @@
 import React from 'react'
 
+// WeatherDisplay
+// Component used to show the main weather summary: location name, temperature, and a short
 export default function WeatherDisplay({ displayName, displayTemp, displayDesc }) {
   return (
     <div>
