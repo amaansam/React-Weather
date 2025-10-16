@@ -121,9 +121,11 @@ function App() {
     ? (forecastData?.city?.timezone ?? 0)
     : (data?.timezone ?? 0)
 
-  const epochSeconds = showForecast
-    ? (dayForecast?.slot?.dt ?? Math.floor(Date.now() / 1000))
-    : Math.floor(Date.now() / 1000)
+  // Always use the real current epoch for the displayed local time so
+  // the clock shows 'now' for the selected location even when a
+  // forecast date is selected. Forecast slot timestamps are retained
+  // for forecast-specific displays elsewhere but not for the local clock.
+  const epochSeconds = Math.floor(Date.now() / 1000)
 
   const localMs = (epochSeconds + tzOffsetSeconds) * 1000
   const localDate = new Date(localMs)
