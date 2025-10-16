@@ -64,6 +64,143 @@ h1 {
   color: #fff;
 }
 
+.search-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+
+
+.date-container {
+  display: inline-block;
+  position: relative; /* allow absolute label positioning */
+}
+
+.date-label {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: 0.4px;
+}
+
+.date-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inputs-row {
+  display: flex;
+  gap: 0.8rem; /* space between the search and date inputs */
+  align-items: center;
+}
+
+.location-input, .date-input {
+  padding: .7rem 1.2rem;
+  font-size: 1.05rem;
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.date-input:disabled {
+  opacity: 0.6;
+  background: rgba(255,255,255,0.03);
+  cursor: not-allowed;
+}
+
+.location-input:focus, .date-input:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.hint {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.85);
+  opacity: 0.9;
+}
+
+.date-help {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  transform: translateY(0);
+  animation: pulse 3s infinite;
+}
+
+.info:focus {
+  outline: 2px solid rgba(255,255,255,0.2);
+}
+
+.tooltip {
+  position: absolute;
+  top: 80px; /* moved further below the button to create breathing room */
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background: rgba(0,0,0,0.9);
+  color: #fff;
+  padding: 0.75rem 1.1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  width: 320px; /* slightly wider for readability */
+  text-align: center;
+  opacity: 0; /* hidden by default */
+  pointer-events: none;
+  transition: opacity 160ms ease, transform 160ms ease;
+  z-index: 9999; /* keep above other UI */
+}
+
+.date-help:hover .tooltip,
+.date-help:focus-within .tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(4px); /* small slide down on reveal */
+  pointer-events: auto;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 6px 18px rgba(0,0,0,0.35); transform: translateY(0); }
+  50% { box-shadow: 0 10px 30px rgba(0,0,0,0.45); transform: translateY(-2px); }
+  100% { box-shadow: 0 6px 18px rgba(0,0,0,0.35); transform: translateY(0); }
+}
+
+/* visually hidden but available to screen readers */
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* hide the old .hint if it's still present */
+.hint { display: none; }
+
 .container {
   max-width: 700px;
   height: 700px;
@@ -86,6 +223,13 @@ h1 {
   right: -90%;
   transform-origin: 0 0;
   transform: rotate(269deg);
+}
+
+.weather-icon {
+  width: 64px;
+  height: 64px;
+  vertical-align: middle;
+  margin-right: 0.6rem;
 }
 
 .App .bottom {
