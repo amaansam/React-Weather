@@ -9,6 +9,7 @@ import './index.css'
 // the date range (today -> five days ahead) used by the date picker.
 import { getCurrentWeather, getForecast } from './api/openWeather'
 import { getTodayAndFiveDaysAhead } from './utils/date'
+import { getDisplayTime } from './utils/time'
 
 
 function App() {
@@ -61,7 +62,6 @@ function App() {
       setError('Could not load forecast. Please try again.')
     }
   }
-
   /*
    * searchLocation
    * - On Enter it loads the current weather
@@ -117,6 +117,9 @@ function App() {
     ? dayForecast.slot.weather?.[0]?.main
     : data.weather && data.weather[0]?.main
 
+  // Use helper to compute the location-local display time (keeps App.jsx cleaner)
+  const displayTime = getDisplayTime({ data, forecastData, use12Hour: true })
+
   // Displays the search + main container with display and details.
   return (
     <div className="App">
@@ -148,6 +151,7 @@ function App() {
             displayFeels={displayFeels}
             displayHumidity={displayHumidity}
             displayWind={displayWind}
+            displayTime={displayTime}
           />
         )}
 
@@ -156,5 +160,4 @@ function App() {
     </div>
   )
 }
-
 export default App
