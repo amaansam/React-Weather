@@ -105,6 +105,18 @@ function App() {
     ? dayForecast.slot.wind?.speed
     : data.wind && data.wind.speed
 
+  // Choose icon code from forecast slot (when showing forecast) or current data
+  const iconCode = showForecast
+    ? dayForecast.slot.weather?.[0]?.icon
+    : data.weather && data.weather[0]?.icon
+
+  const displayIcon = iconCode ? `https://openweathermap.org/img/wn/${iconCode}@2x.png` : null
+
+  // Use the weather "main" (Clouds, Rain, Clear...) so we can map to local SVGs
+  const displayMain = showForecast
+    ? dayForecast.slot.weather?.[0]?.main
+    : data.weather && data.weather[0]?.main
+
   // Displays the search + main container with display and details.
   return (
     <div className="App">
@@ -127,6 +139,8 @@ function App() {
           displayName={displayName}
           displayTemp={displayTemp}
           displayDesc={displayDesc}
+          displayIcon={displayIcon}
+          displayMain={displayMain}
         />
 
         {data.name !== undefined && (

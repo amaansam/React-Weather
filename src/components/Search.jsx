@@ -20,22 +20,41 @@ export default function Search({
   error
 }) {
   return (
-    <>
-      <input
-        value={location}
-        onChange={event => setLocation(event.target.value)}
-        onKeyDown={onKeyDown}
-        placeholder='Enter Location'
-      />
-      <input
-        type="date"
-        value={selectedDate}
-        onChange={onDateChange}
-        disabled={disabled}
-        min={today}
-        max={fiveDaysAhead}
-      />
+    <div className="search-controls">
+      <div className="inputs-row">
+        <input
+          className="location-input"
+          value={location}
+          onChange={event => setLocation(event.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder='Enter Location'
+          aria-label="Location"
+        />
+
+        <div className="date-container">
+          <div className="date-label">Date Picker</div>
+          <div className="date-controls">
+            <input
+              className="date-input"
+              type="date"
+              value={selectedDate}
+              onChange={onDateChange}
+              disabled={disabled}
+              min={today}
+              max={fiveDaysAhead}
+              aria-label="Forecast date"
+            />
+            <div className="date-help" aria-hidden={false}>
+              <button className="info" aria-label="Date help" type="button">i</button>
+              <span className="sr-only">Pick a date within the 5-day forecast. Enter a location first and press Enter to load current weather.</span>
+              <span className="tooltip">Pick a date within the 5-day forecast. Enter a location first and press Enter to load current weather.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {error && <p style={{ marginTop: 8 }}>{error}</p>}
-    </>
+
+    </div>
   )
 }
