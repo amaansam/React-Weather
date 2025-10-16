@@ -9,6 +9,7 @@ import './index.css'
 // the date range (today -> five days ahead) used by the date picker.
 import { getCurrentWeather, getForecast } from './api/openWeather'
 import { getTodayAndFiveDaysAhead } from './utils/date'
+import { getDisplayTime } from './utils/time'
 
 
 function App() {
@@ -116,29 +117,8 @@ function App() {
     ? dayForecast.slot.weather?.[0]?.main
     : data.weather && data.weather[0]?.main
 
-  // Compute local time for the selected location (works for current or forecast)
-  const tzOffsetSeconds = showForecast
-    ? (forecastData?.city?.timezone ?? 0)
-    : (data?.timezone ?? 0)
-
-  // Always use the real current epoch for the displayed local time so
-  // the clock shows 'now' for the selected location even when a
-  // forecast date is selected. Forecast slot timestamps are retained
-  // for forecast-specific displays elsewhere but not for the local clock.
-  const epochSeconds = Math.floor(Date.now() / 1000)
-
-  const localMs = (epochSeconds + tzOffsetSeconds) * 1000
-  const localDate = new Date(localMs)
-  
-  // Format using UTC getters so the result does not get re-interpreted
-  // by the client's local timezone. We add the timezone offset to the
-  // epoch, then read the UTC hours/minutes to get the location-local time.
-  const pad = (n) => String(n).padStart(2, '0')
-  const hrs = localDate.getUTCHours()
-  const mins = localDate.getUTCMinutes()
-  const period = hrs >= 12 ? 'PM' : 'AM'
-  const hrs12 = hrs % 12 === 0 ? 12 : hrs % 12
-  const displayTime = `${hrs12}:${pad(mins)} ${period}`
+  // Use helper to compute the location-local display time (keeps App.jsx cleaner)
+  const displayTime = getDisplayTime({ data, forecastData, use12Hour: true })
 
   // Displays the search + main container with display and details.
   return (
